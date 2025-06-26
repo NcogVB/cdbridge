@@ -27,7 +27,7 @@ export default function StartInSeconds() {
               <img src={checkIco} alt="check" /> No registration needed.
             </li>
             <StyledHomePageLink to={`/swap?inputCurrency=ETH&outputCurrency=${CFC_TOKEN_ADDRESS}`}>
-              Buy CFNC
+              Buy Dex Earth
             </StyledHomePageLink>
           </ul>
         </div>

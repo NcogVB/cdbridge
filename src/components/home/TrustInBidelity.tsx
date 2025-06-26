@@ -12,14 +12,14 @@ export default function TrustInBidelity() {
       <Gs.Container>
         <div className="TrustLeft">
           <h2>
-            Trust in <br /> Chief Finance
+            Trust in <br /> Dex Earth
           </h2>
           <p>
             With its innovative features and unparalleled security measures, Chief Finance is the ultimate choice for
             anyone seeking a reliable and efficient cryptocurrency.
           </p>
           <StyledHomePageLink to={`/swap?inputCurrency=ETH&outputCurrency=${CFC_TOKEN_ADDRESS}`}>
-            Buy CFNC
+            Buy Dex Earth
           </StyledHomePageLink>
           <a className="btn02" href={`https://goerli.etherscan.io/token/${CFC_TOKEN_ADDRESS}`}>
             Learn

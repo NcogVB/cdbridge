@@ -10,7 +10,7 @@ import Web3Status from '../Web3Status';
 import { updateCurrency } from '@bidelity/sdk';
 import caution from '../../assets/images/caution.png';
 import down from '../../assets/images/down.png';
-import LogoImg from '../../assets/images/logo.png';
+import LogoImg from '../../assets/images/logo-green.png';
 import WalletIco from '../../assets/images/wallet.png';
 import ChainDropDown from '../../components/ChainDropDown';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
@@ -79,6 +79,8 @@ const HeaderBx = styled(FlexDiv)`
   padding: 17px 70px;
   background: #fafbff;
   .logo {
+    width: auto;
+    height: 90px;
   }
   .HeaderRight {
     display: flex;

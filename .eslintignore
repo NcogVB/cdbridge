@@ -1,0 +1,3 @@
+# Ignore charting library type definitions and vendor files
+src/charting_library/
+public/charting_library/ 

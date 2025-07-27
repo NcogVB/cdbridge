@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background: linear-gradient(180deg, #f5f3fa 0%, #f6f5fa 100%);
+}
+
+.hero-section {
+  background-image: url(/images2/hero-bg.png);
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hero-border {
+  background: radial-gradient(98% 49.86% at 100.03% 100%, #33a36d 0%, rgba(51, 163, 109, 0.05) 100%),
+    radial-gradient(24.21% 39.21% at 0% 0%, rgba(255, 255, 255, 0.81) 0%, rgba(255, 255, 255, 0.19) 100%),
+    radial-gradient(21.19% 40.1% at 100.03% 0%, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+[data-tab-content] {
+  display: none;
+}
+
+.marketTrend-active[data-tab-content] {
+  display: block;
+}
+
+.marketTrend-btn.marketTrend-active {
+  background-color: #d6fff8;
+  color: #3dbea3;
+  border-radius: 33px;
+}
+
+.Marquee-content:hover {
+  animation-play-state: paused;
+}
+
+.Marquee-tag {
+  transition: transform 0.1s ease;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.percentage-redio-buttons input:checked ~ label {
+  border: 1px solid #ffffff;
+  color: #2a8576;
+  background-color: white;
+}
+
+.active-orders {
+  background-color: #ffffff;
+  font-weight: 700;
+  color: #2a8576;
+}
+
+.header-active {
+  font-weight: 700;
+  position: relative;
+  color: #131319;
+}
+
+.header-active::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  margin-top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #2a8576;
+  border-radius: 50%;
+}
+
+@media (max-width: 1023px) {
+  .showNavbar-open {
+    transform: translateX(350px);
+  }
+
+  .header-active::before {
+    top: 50%;
+    margin-top: 0px;
+    left: unset;
+    transform: translateX(0px);
+    right: -10px;
+  }
+}

@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer>
       <div className="container mx-auto md:px-6 px-4 pb-[30px] pt-[56px]">
-        <h1 className="w-full text-center text-[20vw] leading-none font-bold text-[#2A8576]">NCOG</h1>
+        <h1 className="w-full text-center text-[20vw] leading-none font-bold text-[#2A8576]">DEX</h1>
         <div className="flex justify-between md:flex-row flex-col-reverse md:items-end mt-[90px] md:gap-4 gap-8">
           <p className="font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center">
             ©2024 MOJEK MONEY. ALL RIGHTS RESERVED

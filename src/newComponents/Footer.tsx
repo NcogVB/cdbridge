@@ -12,7 +12,7 @@ const Footer = () => {
   rel="noopener noreferrer" 
   className="!underline decoration-black text-black font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center"
 >
-  ©2025 Powered by Ncog.earth
+  ©2025 Powered by Ncog.Earth
 </a>
 
           <div className="flex lg:gap-[90px] md:gap-[50px] gap-[25px] font-normal sm:text-[12px] text-[10px] leading-8 text-[#767676]">

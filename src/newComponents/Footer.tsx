@@ -7,14 +7,14 @@ const Footer = () => {
         <h1 className="w-full text-center text-[20vw] leading-none font-bold text-[#2A8576]">DEX</h1>
         <div className="flex justify-between md:flex-row flex-col-reverse md:items-end mt-[90px] md:gap-4 gap-8">
 
-          <div className="flex flex-col justify-between">
-          <span> Charts are powered by  
+          <div className="flex flex-col justify-between gap-4">
+          <span className="text-black font-light text-xs"> Charts are powered by  
             <a 
   href="https://in.tradingview.com/  " 
   target="_blank" 
   rel="noopener noreferrer" 
   className="!underline decoration-black text-black font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center"
->
+> <span> </span>
    Trading View
 </a></span>
 

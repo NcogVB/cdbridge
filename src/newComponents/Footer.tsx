@@ -8,15 +8,6 @@ const Footer = () => {
         <div className="flex justify-between md:flex-row flex-col-reverse md:items-end mt-[90px] md:gap-4 gap-8">
 
           <div className="flex flex-col justify-between gap-4">
-
-            <a 
-  href="https://ncog-pub.s3.us-east-1.amazonaws.com/dex/tradingview-contract.pdf" 
-  target="_blank" 
-  rel="noopener noreferrer" 
-  className="!underline decoration-black text-black font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center"
->
-  Link to the Contract
-</a>
             
           <span className="text-black font-light text-xs"> Charts are powered by  
             <a 

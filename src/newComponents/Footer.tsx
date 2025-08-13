@@ -15,7 +15,7 @@ const Footer = () => {
   rel="noopener noreferrer" 
   className="!underline decoration-black text-black font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center"
 >
-  Link to the Contracts
+  Link to the Contract
 </a>
             
           <span className="text-black font-light text-xs"> Charts are powered by  

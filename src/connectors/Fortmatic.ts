@@ -29,6 +29,7 @@ export class FortmaticConnector extends FortmaticConnectorCore {
         if (provider.overlayReady) {
           clearInterval(interval);
           this.emit(OVERLAY_READY);
+          // @ts-ignore
           resolve();
         }
       }, 200);

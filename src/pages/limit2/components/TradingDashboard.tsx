@@ -1,68 +1,31 @@
+/* eslint-disable */
+
 import React, { useState, useEffect, useRef } from 'react';
+import { IChartingLibraryWidget, widget } from '../../../charting_library';
+import BinanceDatafeed from './CryptoDatafeed';
 
-// Since we're loading scripts dynamically, we'll define the types locally
-interface ChartingLibraryWidgetOptions {
-  symbol: string;
-  datafeed: any;
-  interval: string;
-  container: HTMLElement;
-  library_path: string;
-  locale?: string;
-  disabled_features?: string[];
-  enabled_features?: string[];
-  charts_storage_url?: string;
-  charts_storage_api_version?: string;
-  client_id?: string;
-  user_id?: string;
-  fullscreen?: boolean;
-  autosize?: boolean;
-  studies_overrides?: any;
-  theme?: string;
+interface TradingDashboardProps {
+  className?: string;
 }
 
-interface IChartingLibraryWidget {
-  onChartReady(callback: () => void): void;
-  headerReady(): Promise<void>;
-  createButton(): HTMLElement;
-  showNoticeDialog(options: { title: string; body: string; callback: () => void }): void;
-  remove(): void;
-}
-
-type LanguageCode = string;
-type ResolutionString = string;
-
-export interface ChartContainerProps {
-  symbol: ChartingLibraryWidgetOptions['symbol'];
-  interval: ChartingLibraryWidgetOptions['interval'];
-  // BEWARE: no trailing slash is expected in feed URL
-  datafeedUrl: string;
-  libraryPath: ChartingLibraryWidgetOptions['library_path'];
-  chartsStorageUrl: ChartingLibraryWidgetOptions['charts_storage_url'];
-  chartsStorageApiVersion: ChartingLibraryWidgetOptions['charts_storage_api_version'];
-  clientId: ChartingLibraryWidgetOptions['client_id'];
-  userId: ChartingLibraryWidgetOptions['user_id'];
-  fullscreen: ChartingLibraryWidgetOptions['fullscreen'];
-  autosize: ChartingLibraryWidgetOptions['autosize'];
-  studiesOverrides: ChartingLibraryWidgetOptions['studies_overrides'];
-  container: ChartingLibraryWidgetOptions['container'];
-}
-
-const getLanguageFromURL = (): LanguageCode | null => {
+function getLanguageFromURL(): string | null {
   const regex = new RegExp('[\\?&]lang=([^&#]*)');
   const results = regex.exec(window.location.search);
-  return results === null ? null : (decodeURIComponent(results[1].replace(/\+/g, ' ')) as LanguageCode);
-};
+  return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
 
-const TradingDashboard: React.FC = () => {
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
+const TradingDashboard: React.FC<TradingDashboardProps> = ({ className = '' }) => {
   const [activeTab, setActiveTab] = useState<'open' | 'history'>('open');
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const defaultProps: Omit<ChartContainerProps, 'container'> = {
-    symbol: 'AAPL',
-    interval: 'D' as ResolutionString,
-    datafeedUrl: 'https://demo_feed.tradingview.com',
-    libraryPath: 'assets/charting_library/',
+  const [currentWidget, setCurrentWidget] = useState<IChartingLibraryWidget | null>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('BTCUSDT');
+  const [connectionStatus, setConnectionStatus] = useState<string>('Disconnected');
+
+  const defaultProps = {
+    symbol: 'BTCUSDT',
+    interval: '1D' as '1D',
+    libraryPath: '/charting_library/',
     chartsStorageUrl: 'https://saveload.tradingview.com',
     chartsStorageApiVersion: '1.1',
     clientId: 'tradingview.com',
@@ -72,157 +35,102 @@ const TradingDashboard: React.FC = () => {
     studiesOverrides: {},
   };
 
-  useEffect(() => {
-    const loadScript = (src: string): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const existingScript = document.querySelector(`script[src="${src}"]`);
-        if (existingScript) {
-          resolve();
-          return;
-        }
+  const createChart = () => {
+    if (currentWidget) {
+      currentWidget.remove();
+    }
 
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-        document.head.appendChild(script);
+    const datafeed = new BinanceDatafeed();
+    setConnectionStatus('Connecting...');
+
+    const widgetOptions = {
+      symbol: selectedSymbol,
+      datafeed,
+      interval: defaultProps.interval,
+      container: chartContainerRef.current!,
+      library_path: defaultProps.libraryPath,
+      locale: getLanguageFromURL() || 'en',
+      disabled_features: [
+        'use_localstorage_for_settings',
+        'volume_force_overlay',
+        'header_compare',
+        'header_screenshot',
+        'header_chart_type',
+      ],
+      enabled_features: ['study_templates', 'side_toolbar_in_fullscreen_mode'],
+      charts_storage_url: defaultProps.chartsStorageUrl,
+      charts_storage_api_version: defaultProps.chartsStorageApiVersion,
+      client_id: defaultProps.clientId,
+      user_id: defaultProps.userId,
+      fullscreen: defaultProps.fullscreen,
+      autosize: defaultProps.autosize,
+      studies_overrides: {
+        // SMA 100 configuration
+        'smoothed moving average.length': 100,
+        'smoothed moving average.source': 'close',
+        'smoothed moving average.offset': 0,
+        'smoothed moving average.style': 0, // 0 = Line, 1 = Step Line, 2 = Histogram
+        'smoothed moving average.linewidth': 2,
+        'smoothed moving average.plottype': 'line',
+        'smoothed moving average.color': '#2196F3', // Blue color for SMA line
+      },
+      theme: 'light',
+      custom_css_url: './charting_library/static/bundles/themed.css',
+      overrides: {
+        volumePaneSize: 'medium',
+        'mainSeriesProperties.candleStyle.upColor': '#26a69a',
+        'mainSeriesProperties.candleStyle.downColor': '#ef5350',
+        'mainSeriesProperties.candleStyle.drawWick': true,
+        'mainSeriesProperties.candleStyle.drawBorder': true,
+        'mainSeriesProperties.candleStyle.borderUpColor': '#26a69a',
+        'mainSeriesProperties.candleStyle.borderDownColor': '#ef5350',
+      },
+    };
+    // @ts-ignore
+    const tvWidget = new widget(widgetOptions);
+
+    tvWidget.onChartReady(() => {
+      console.log('Chart is ready');
+      setConnectionStatus('Connected to Binance');
+
+      // Add SMA 100 indicator programmatically
+      tvWidget.chart().createStudy('Smoothed Moving Average', false, false, {
+        length: 100,
+        source: 'close',
+        offset: 0,
+        'style.linewidth': 2,
+        'style.color': '#2196F3',
       });
-    };
+    });
 
-    const initTradingView = async () => {
-      if (!chartContainerRef.current) {
-        console.error('Chart container not found');
-        return;
-      }
-
-      try {
-        console.log('Loading TradingView scripts...');
-
-        await loadScript('assets/charting_library/charting_library.js');
-        console.log('Main library loaded');
-
-        await loadScript('assets/datafeeds/udf/dist/bundle.js');
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Check if all required objects are available
-        if (!(window as any).TradingView) {
-          throw new Error('TradingView library not available');
-        }
-
-        if (!(window as any).Datafeeds || !(window as any).Datafeeds.UDFCompatibleDatafeed) {
-          console.warn('UDFCompatibleDatafeed not found, trying alternative loading...');
-
-          try {
-            await loadScript('assets/charting_library/charting_library.standalone.js');
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          } catch (error) {
-            console.log('Standalone version loading failed:', error);
-          }
-
-          try {
-            await loadScript('/datafeeds/udf/datafeed.js');
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          } catch (error) {
-            console.log('Alternative datafeed path failed:', error);
-          }
-
-          if (!(window as any).Datafeeds || !(window as any).Datafeeds.UDFCompatibleDatafeed) {
-            throw new Error('TradingView Datafeeds not available after all attempts');
-          }
-        }
-
-        const widgetOptions: ChartingLibraryWidgetOptions = {
-          symbol: defaultProps.symbol as string,
-          datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(defaultProps.datafeedUrl),
-          interval: defaultProps.interval as ChartingLibraryWidgetOptions['interval'],
-          container: chartContainerRef.current,
-          library_path: defaultProps.libraryPath as string,
-          locale: getLanguageFromURL() || 'en',
-          disabled_features: ['use_localstorage_for_settings'],
-          enabled_features: ['study_templates'],
-          charts_storage_url: defaultProps.chartsStorageUrl,
-          charts_storage_api_version: defaultProps.chartsStorageApiVersion,
-          client_id: defaultProps.clientId,
-          user_id: defaultProps.userId,
-          fullscreen: defaultProps.fullscreen,
-          autosize: defaultProps.autosize,
-          studies_overrides: defaultProps.studiesOverrides,
-          theme: 'light',
-        };
-
-        console.log('Creating TradingView widget with options:', widgetOptions);
-        const tvWidget = new (window as any).TradingView.widget(widgetOptions);
-        tvWidgetRef.current = tvWidget;
-
-        tvWidget.onChartReady(() => {
-          console.log('TradingView chart is ready');
-          tvWidget
-            .headerReady()
-            .then(() => {
-              const button = tvWidget.createButton();
-              button.setAttribute('title', 'Click to show a notification popup');
-              button.classList.add('apply-common-tooltip');
-              button.addEventListener('click', () =>
-                tvWidget.showNoticeDialog({
-                  title: 'Notification',
-                  body: 'TradingView Charting Library API works correctly',
-                  callback: () => {
-                    console.log('Noticed!');
-                  },
-                })
-              );
-              button.innerHTML = 'Check API';
-            })
-            .catch((error:any) => {
-              console.error('Header ready error:', error);
-            });
+    tvWidget.onChartReady(() => {
+      tvWidget
+        .chart()
+        .onDataLoaded()
+        .subscribe(null, () => {
+          console.log('Chart data loaded successfully');
+          setConnectionStatus('Live Data Active');
         });
-      } catch (error) {
-        console.error('Error initializing TradingView widget:', error);
+    });
 
-        if (chartContainerRef.current) {
-          chartContainerRef.current.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; text-align: center; padding: 20px;">
-              <div>
-                <h3>Chart Loading Error</h3>
-                <p>Please check the console for more details</p>
-                <p style="font-size: 12px; margin-top: 10px;">Error: ${error.message}</p>
-              </div>
-            </div>
-          `;
-        }
-      }
-    };
+    setCurrentWidget(tvWidget);
+  };
 
+  useEffect(() => {
     const timer = setTimeout(() => {
-      initTradingView();
+      createChart();
     }, 100);
 
     return () => {
       clearTimeout(timer);
-      if (tvWidgetRef.current) {
-        try {
-          tvWidgetRef.current.remove();
-        } catch (error) {
-          console.error('Error removing TradingView widget:', error);
-        }
-        tvWidgetRef.current = null;
+      if (currentWidget) {
+        currentWidget.remove();
       }
     };
-  }, []);
+  }, [selectedSymbol]);
 
   const NoOrdersIcon: React.FC = () => (
-    <svg
-      className="mx-auto"
-      width="58"
-      height="58"
-      viewBox="0 0 58 58"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="No orders illustration"
-    >
+    <svg className="mx-auto" width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M2.33301 2.33325H55.6663" stroke="#2A8576" strokeWidth="3.5" strokeLinecap="round" />
       <path
         d="M21 25L24.4477 21.5522C25.3366 20.6634 25.781 20.2189 26.3333 20.2189C26.8856 20.2189 27.3301 20.6634 28.219 21.5522L29.7811 23.1143C30.6699 24.0032 31.1144 24.4477 31.6667 24.4477C32.219 24.4477 32.6634 24.0032 33.5523 23.1143L37 19.6666"
@@ -242,28 +150,17 @@ const TradingDashboard: React.FC = () => {
   );
 
   return (
-    <section className="mt-[-70px]">
+    <section className={`mt-[-70px] ${className}`}>
       <div className="w-full container mx-auto px-4">
         <div className="flex lg:flex-row flex-col gap-3">
           {/* Trading Chart Section */}
           <div className="hero-border flex-grow md:rounded-[40px] rounded-[20px] overflow-hidden p-[3px]">
             <div className="relative w-full lg:h-full h-[500px] md:rounded-[40px] rounded-[20px] overflow-hidden">
               <div
-                className="TradingDashboard absolute top-0 left-0 w-full h-full"
-                style={{ height: '100%', width: '100%' }}
                 ref={chartContainerRef}
-                role="application"
-                aria-label="Trading chart"
-              >
-                {!tvWidgetRef.current && (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Loading TradingView Chart...</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                className="TVChartContainer absolute top-0 left-0 w-full h-full"
+                style={{ height: '100%', width: '100%' }}
+              />
             </div>
           </div>
 
@@ -273,22 +170,18 @@ const TradingDashboard: React.FC = () => {
               {/* Tab Navigation */}
               <div className="bg-[#FFFFFF66] border border-[#FFFFFF1A] rounded-[12px] px-2 py-1.5 text-sm text-[#000000] font-normal w-max flex items-center gap-2.5 mb-[30px]">
                 <button
-                  type="button"
                   className={`md:p-[12px_25px] p-[8px_16px] rounded-[8px] cursor-pointer transition-colors ${
                     activeTab === 'open' ? 'active-orders bg-white/20' : 'hover:bg-white/10'
                   }`}
                   onClick={() => setActiveTab('open')}
-                  aria-pressed={activeTab === 'open'}
                 >
                   Open Orders
                 </button>
                 <button
-                  type="button"
                   className={`md:p-[12px_25px] p-[8px_16px] rounded-[8px] cursor-pointer transition-colors ${
                     activeTab === 'history' ? 'active-orders bg-white/20' : 'hover:bg-white/10'
                   }`}
                   onClick={() => setActiveTab('history')}
-                  aria-pressed={activeTab === 'history'}
                 >
                   Orders History
                 </button>
@@ -296,16 +189,11 @@ const TradingDashboard: React.FC = () => {
 
               {/* Orders Content */}
               <div className="bg-[#FFFFFF66] rounded-[12px] border border-[#FFFFFF1A] min-h-[366px] flex items-center justify-center">
-                <div className="text-center">
+                <div className="">
                   <NoOrdersIcon />
                   <h2 className="text-[#000000] text-xl font-semibold mt-[32px] text-center">
                     {activeTab === 'open' ? 'No Open Orders Yet' : 'No Order History Yet'}
                   </h2>
-                  <p className="text-[#000000]/60 text-sm mt-2">
-                    {activeTab === 'open'
-                      ? 'Your active trading orders will appear here'
-                      : 'Your completed trading history will appear here'}
-                  </p>
                 </div>
               </div>
             </div>

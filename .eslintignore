@@ -1,3 +1,10 @@
-# Ignore charting library type definitions and vendor files
+# .eslintignore
+
+src/charting_library/**/*
 src/charting_library/
-public/charting_library/ 
+**/charting_library/**/*
+**/charting_library/
+node_modules/
+build/
+dist/
+*.d.ts

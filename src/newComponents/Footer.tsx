@@ -6,6 +6,17 @@ const Footer = () => {
       <div className="container mx-auto md:px-6 px-4 pb-[30px] pt-[56px]">
         <h1 className="w-full text-center text-[20vw] leading-none font-bold text-[#2A8576]">DEX</h1>
         <div className="flex justify-between md:flex-row flex-col-reverse md:items-end mt-[90px] md:gap-4 gap-8">
+        <span>
+        Chart Powererd by 
+        <a 
+          href="https://www.tradingview.com/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="!underline decoration-black text-black font-light text-xs leading-[13.2px] text-[#767676] md:text-start text-center"
+        >
+          Trading View
+        </a>
+      </span>
         <a 
   href="https://ncog.earth/" 
   target="_blank" 
